@@ -18,8 +18,10 @@ interface Model {
 interface Props {
    params: Param[];
    model: Model;
+   removeParam: any;
 }
 interface Input {
+  removeParam: any,
   relatedParam: string | undefined,
   params : Param[];
   el: ParamValue
@@ -28,6 +30,7 @@ interface AddBlockProps {
   pressButton: boolean
 }
 interface SelectModelTypeProps {
+  /////////////////////////////////////////////////////////
   setCurrentSelect: any
 }
 interface SelectModelButtonProps {
@@ -57,7 +60,7 @@ const AppWrapper = styled.div`
   padding-top: 200px;
   width: 100%;
   height: calc(100vh - 200px);
-  background-color: #e6e6e6;
+  background-color: #272640;
 `;
 
 ///// RIGHT BLOCK ///// 
@@ -67,12 +70,12 @@ const AddBlock = styled.div<AddBlockProps>`
     position: relative;
     transition:.3s;
     width: 400px;
-    background-color: #ffffff;
+    background-color: #3d2a57;
     box-shadow: 0 0 10px 2px rgba(0,0,0,0.1);
     margin-right: 20px;
     border-radius: 10px;
     &:hover {
-      box-shadow: 0 0 15px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 0 15px 5px #00000036;
     }
 `;
 
@@ -92,14 +95,16 @@ const AddButton = styled.button`
     border-radius: 50%;
     cursor: pointer;
     background: rgb(215,59,59);
-    background: linear-gradient(159deg, #c96060 0%, rgba(173,16,170,1) 100%);
+    background: linear-gradient(159deg, #8d3b8d 0%, #9e2e59 100%);
     color: white;
     font-size: 24px;
     &:hover {
-      box-shadow: 0 0 15px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 0 10px 5px #00000076;
     }
 
     &:active {
+      color: #eeeeee;
+      background: linear-gradient(159deg, #642664 0%, #6e1c3b 100%);
       box-shadow: inset 0 0 15px 5px rgba(0,0,0,0.2);
     }
 `;
@@ -166,15 +171,17 @@ const SelectModelButton = styled.button<SelectModelButtonProps>`
   border-radius: 50%;
   cursor: pointer;
   background: rgb(215,59,59);
-  background: linear-gradient(159deg, #9c4343 0%, #853183 100%);
+  background: linear-gradient(159deg, #144552 0%, #1d857f 100%);
   color: white;
   font-size: 14px;
   &:hover {
-    box-shadow: 0 0 15px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 0 10px 3px #00000092;
   }
 
   &:active {
+    color: #eeeeee;
     box-shadow: inset 0 0 15px 5px rgba(0,0,0,0.2);
+    background: linear-gradient(159deg, #103a46 0%, #095c58 100%);
   }
 
   animation: ${props=>{switch(props.position){
@@ -198,8 +205,8 @@ const Submit = styled.button`
     margin: 0 auto;
     display: block;
     animation: ${Opacity_0_to_1} 1s ease;
-    background-color: black;
-    color: white;
+    background-color: #181818;
+    color: #eeeeee;
     border-radius: 3px;
     border: none;
     outline: none;
@@ -207,7 +214,6 @@ const Submit = styled.button`
 
     &:hover {
       background-color: #4d4d4d;
-      color: white;
     }
     &:active {
       background-color: #b3b3b3;
@@ -217,6 +223,7 @@ const Submit = styled.button`
 `;
 
 const InputLabel = styled.label`
+    color: #eeeeee;
     text-align: center;
     margin-top: 90px;
     display: block;
@@ -245,11 +252,18 @@ const InputParam = styled.input`
 `;
 
 const CurrentSelectSpan = styled.span`
-  display: block;
-  height: 60px;
-  padding: 10px;
-  font-size: 18px;
-  text-decoration: underline;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #240d24;
+    width: 60px;
+    display: block;
+    color: #ee82ee;
+    display: block;
+    height: 22px;
+    padding: 10px;
+    margin: 10px 0px 120px 10px;
 `;
 
 ///// LEFT BLOCK //////  
@@ -258,10 +272,10 @@ const ParamEditorBlock = styled.div`
 
     width: 450px;
     min-height: 300px;
-    background-color: #acacac;
+    background-color: #273a3a;
     border-radius: 10px;
-    padding: 15px;
-    padding-left: 25px;
+    overflow: hidden;
+
     transition: .5s;
     box-shadow: 0 0 10px 2px rgba(0,0,0,0.1);
 
@@ -279,12 +293,21 @@ const SubmitParam = styled.button`
     display: block;
     margin: 0 auto;
     margin-top: 30px;
+    margin-bottom: 20px;
+
+    outline: none;
+    border: none;
+    cursor: pointer;
+    color: #eeeeee;
+    background-color: #181818;
+    height: 40px;
 `;
 
 const EditInputLabel = styled.label`
     margin-left: 30px;
     display: inline-block;
     width: 100px;
+    color: #eeeeee;
 `;
 
 const EditInput = styled.input`
@@ -332,13 +355,13 @@ const TypeSpan = styled.span<TypeSpanProps>`
     color: ${props=>{
       switch (props.color){
         case 'text':
-          return '#004aac;';
+          return '#6ea7f1;';
           break;
         case 'number':
-          return '#006961;';
+          return '#43c0b6;';
           break;
         case 'select':
-          return '#5f1937;';
+          return '#d85f94;';
           break;
       }
     }}; 
@@ -363,24 +386,49 @@ const Delete = styled.button`
   font-size: 8px;
   font-weight: 700;
   transform: translateY(-3px);
+  background-color: #7a0913;
+  color: white;
   cursor: pointer;
   &:hover,:active {
-    background-color: #7a0913;
+    background-color: #d6515c;
     color: white;
   }
 `;
 
+
+const ParamRowAnimation = keyframes`  
+   from { background-color: #75e3ff56; }
+   to { background-color: none; }
+`;
+
+
 const ParamRow = styled.div`
-padding-left: 5px;
-border-radius: 10px;
+animation: ${ParamRowAnimation} 1s ease;
+padding-left: 10px;
 cursor: pointer;
   &:hover {
-    background-color: #00000028;
+    background-color: #00000058;
   }
 
   &:hover ${Delete} {
     opacity: 1;
   }
+`;
+
+const ProductInfo = styled.h1`
+    display: block;
+    color: #eeeeee;
+    background-color: #161616;
+    width: 100%;
+    height: 20px;
+    margin-top: -10px;
+    padding: 20px 30px;
+    font-size: 24px;
+`;
+
+const BracketsSpan = styled.span`
+    font-weight: 700;
+    color: #acacac;
 `;
 
 ///////////////// COMPONENTS /////////////////
@@ -406,13 +454,13 @@ class ParamEditor extends React.Component<Props> {
    render(): React.ReactNode {
       const inputs = this.props.model.paramValues.map(el=>{
           const relatedParam = this.props.params.find(el2=>el2.id==el.paramId)?.type;
-          return <Input relatedParam={relatedParam} params={this.props.params} el={el} />
+          return <Input removeParam={this.props.removeParam} relatedParam={relatedParam} params={this.props.params} el={el} />
       });
 
       return (
         <ParamEditorBlock>
             <form action="">
-              <h1>Product info</h1>
+              <ProductInfo>Product info</ProductInfo>
                 {inputs}
                 <SubmitParam type="submit" value="submit">Отправить</SubmitParam>
             </form>
@@ -423,11 +471,16 @@ class ParamEditor extends React.Component<Props> {
 
 
 
-const Input:React.FC<Input> = ({relatedParam, params, el}) => {
+const Input:React.FC<Input> = ({removeParam, relatedParam, params, el}) => {
 
   const [value, setValue] = useState(el.value);
   const changeValue = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
       setValue(event.target.value);
+  }
+
+  const remove = (e:React.MouseEvent<HTMLButtonElement>, id:number) => {
+    e.preventDefault();
+    removeParam(id);
   }
 
   let type;
@@ -450,10 +503,12 @@ const Input:React.FC<Input> = ({relatedParam, params, el}) => {
     const labelName = params.find((el2:any)=>el.paramId==el2.id)?.name;
     resultInput = (
       <ParamRow>
-          [<TypeSpan color={type}>{type}</TypeSpan>]
+          <BracketsSpan>[</BracketsSpan>
+              <TypeSpan color={type}>{type}</TypeSpan>
+          <BracketsSpan>]</BracketsSpan>
           <EditInputLabel htmlFor={String(el.paramId)}>{labelName}</EditInputLabel>
           <EditInput onChange={changeValue} key={el.paramId} id={String(el.paramId)} type={type} value={value} />
-          <Delete>x</Delete>
+          <Delete onClick={(e)=>remove(e, el.paramId)}>x</Delete>
       </ParamRow>
     )
   }
@@ -462,14 +517,16 @@ const Input:React.FC<Input> = ({relatedParam, params, el}) => {
     const labelName = params.find((el2:any)=>el.paramId==el2.id)?.name;
     resultInput = (
       <ParamRow>
-          [<TypeSpan color={type}>{type}</TypeSpan>]
+          <BracketsSpan>[</BracketsSpan>
+              <TypeSpan color={type}>{type}</TypeSpan>
+          <BracketsSpan>]</BracketsSpan>
           <EditInputLabel htmlFor={String(el.paramId)}>{labelName}</EditInputLabel>
           <EditSelect onChange={changeValue} key={el.paramId} id={String(el.paramId)} value={value}>
             <option>red</option>
             <option>green</option>
             <option>blue</option>
           </EditSelect>
-          <Delete>x</Delete>
+          <Delete onClick={(e)=>remove(e, el.paramId)}>x</Delete>
       </ParamRow>
     )
   }
@@ -485,6 +542,8 @@ export const AddParam:React.FC<any> = ({addParam}) => {
   const [currentSelect, setCurrentSelect] = useState(ParamTypes.null);
 
   const [inputText, setInputText] = useState('');
+
+  ///////////////////////////////////////////////////////////////////////////////////////
   const inputChange = (value:string) => {
     setInputText(value);
   }
@@ -568,11 +627,16 @@ export const App: React.FC = () => {
       setParams([...params , { "id": nextID, "name": paramName, type: paramType }]);
       setModel ( {...model, paramValues: [...model.paramValues, { "paramId": nextID, "value": "" }]});
     }
+
+    const removeParam = (paramID:number)=>{
+      setParams([...params.filter(el=>el.id!=paramID)]);
+      setModel ( {...model, paramValues: [...model.paramValues.filter(el=>el.paramId!=paramID)]});
+    }
   return (
     <AppWrapper>
       <Content>
         <AddParam addParam={addParam}/>
-        <ParamEditor params={params} model={model} />
+        <ParamEditor params={params} model={model} removeParam={removeParam}/>
       </Content>
     </AppWrapper>
   );
