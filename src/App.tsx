@@ -19,8 +19,10 @@ interface Props {
    params: Param[];
    model: Model;
    removeParam: any;
+   editModel: Function;
 }
 interface Input {
+  EditModel: Function,
   removeParam: any,
   relatedParam: string | undefined,
   params : Param[];
@@ -30,11 +32,14 @@ interface AddBlockProps {
   pressButton: boolean
 }
 interface SelectModelTypeProps {
-  /////////////////////////////////////////////////////////
   setCurrentSelect: any
 }
 interface SelectModelButtonProps {
   position: string
+}
+
+interface TypeSpanProps {
+  color: string;
 }
 
 ///////////////// ENUMS /////////////////
@@ -355,9 +360,7 @@ const EditSelect = styled.select`
     }
 `;
 
-interface TypeSpanProps {
-  color: string;
-}
+
 
 const TypeSpan = styled.span<TypeSpanProps>`
     color: ${props=>{
@@ -381,46 +384,44 @@ const TypeSpan = styled.span<TypeSpanProps>`
 `;
 
 const Delete = styled.button`
-  opacity: 0;
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  text-align: center;
-  border-radius: 50%;
-  border: none;
-  outline: none;
-  padding: 0px;
-  margin-left: 4px;
-  font-size: 8px;
-  font-weight: 700;
-  transform: translateY(-3px);
-  background-color: #7a0913;
-  color: white;
-  cursor: pointer;
-  &:hover,:active {
-    background-color: #d6515c;
+    opacity: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    text-align: center;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    padding: 0px;
+    margin-left: 4px;
+    font-size: 8px;
+    font-weight: 700;
+    transform: translateY(-3px);
+    background-color: #7a0913;
     color: white;
-  }
+    cursor: pointer;
+    &:hover,:active {
+      background-color: #d6515c;
+      color: white;
+    }
 `;
-
 
 const ParamRowAnimation = keyframes`  
    from { background-color: #75e3ff56; }
    to { background-color: none; }
 `;
 
-
 const ParamRow = styled.div`
-animation: ${ParamRowAnimation} 1s ease;
-padding-left: 10px;
-cursor: pointer;
-  &:hover {
-    background-color: #00000058;
-  }
+    animation: ${ParamRowAnimation} 1s ease;
+    padding-left: 10px;
+    cursor: pointer;
+    &:hover {
+        background-color: #00000058;
+    }
 
-  &:hover ${Delete} {
-    opacity: 1;
-  }
+    &:hover ${Delete} {
+        opacity: 1;
+    }
 `;
 
 const ProductInfo = styled.h1`
@@ -444,33 +445,33 @@ const BracketsSpan = styled.span`
 
 class ParamEditor extends React.Component<Props> {
 
-  public props:Props;
 
+  public props:Props;
   constructor(props: Props){
     super(props);
     this.props = props;
   }
 
-   public getModel(): Model {
-    
-    return this.props.model;
-    
+  public EditModel = (e:React.ChangeEvent<HTMLInputElement>, paramID:number) => {
+    this.props.editModel(e, paramID);
+  }
+
+  public getModel = (): Model => {
+      return this.props.model;
    }
 
-
-   public consoleLogMode = (e:React.MouseEvent<HTMLButtonElement>) => {
+  public consoleLogMode = (e:React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       console.group('%c RESULT MODEL: ', 'background: #222; color: #5eff8e');
       console.log(this.getModel());
       console.groupEnd();
-      alert("Check your browser console")
+      alert("Result in your browser console!");
    }
-
 
    render(): React.ReactNode {
       const inputs = this.props.model.paramValues.map(el=>{
           const relatedParam = this.props.params.find(el2=>el2.id==el.paramId)?.type;
-          return <Input key={el.paramId} removeParam={this.props.removeParam} relatedParam={relatedParam} params={this.props.params} el={el} />
+          return <Input EditModel={this.EditModel} key={el.paramId} removeParam={this.props.removeParam} relatedParam={relatedParam} params={this.props.params} el={el} />
       });
 
       return (
@@ -487,11 +488,13 @@ class ParamEditor extends React.Component<Props> {
 
 
 
-const Input:React.FC<Input> = ({removeParam, relatedParam, params, el}) => {
+const Input:React.FC<Input> = ({EditModel, removeParam, relatedParam, params, el}) => {
+
 
   const [value, setValue] = useState(el.value);
   const changeValue = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
       setValue(event.target.value);
+      EditModel(event, el.paramId);
   }
 
   const remove = (e:React.MouseEvent<HTMLButtonElement>, id:number) => {
@@ -613,6 +616,7 @@ export const App: React.FC = () => {
         { "id": 2, "name": "Длина", type: ParamTypes.string },
         { "id": 3, "name": "Цвет", type: ParamTypes.enum },
         { "id": 4, "name": "Стоимость", type: ParamTypes.int },
+        { "id": 5, "name": "Вес (кг)", type: ParamTypes.int },
     ]);
 
     const [model, setModel] = useState({
@@ -620,7 +624,8 @@ export const App: React.FC = () => {
         { "paramId": 1, "value": "повседневное" }, 
         { "paramId": 2, "value": "макси" },
         { "paramId": 3, "value": "green"},
-        { "paramId": 4, "value": "9999" }
+        { "paramId": 4, "value": "9999" },
+        { "paramId": 5, "value": "2.75" }
       ]
     });
 
@@ -635,11 +640,18 @@ export const App: React.FC = () => {
       setModel ( {...model, paramValues: [...model.paramValues.filter(el=>el.paramId!=paramID)]});
     }
 
+    const editModel = ( e:React.ChangeEvent<HTMLInputElement>, paramID:number) => {
+      setModel ( {...model, paramValues: [...model.paramValues.map(el=>{
+        if (el.paramId == paramID)return {...el,value: e.target.value};
+        return el;})]}
+     );
+    }
+
   return (
     <AppWrapper>
       <Content>
         <AddParam addParam={addParam}/>
-        <ParamEditor params={params} model={model} removeParam={removeParam}/>
+        <ParamEditor editModel={editModel} params={params} model={model} removeParam={removeParam}/>
       </Content>
     </AppWrapper>
   );
