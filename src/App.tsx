@@ -287,20 +287,28 @@ const ParamEditorBlock = styled.div`
 const SubmitParam = styled.button`
     font-family: 'Open Sans Condensed', sans-serif; 
     font-weight: 700;
-    font-size: 14px;
+    height: 40px;
     width: 200px;
-    height: 30px;
-    display: block;
     margin: 0 auto;
-    margin-top: 30px;
+    display: block;
+    animation: ${Opacity_0_to_1} 1s ease;
+    background-color: #181818;
+    color: #eeeeee;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    margin-top: 20px;
     margin-bottom: 20px;
 
-    outline: none;
-    border: none;
-    cursor: pointer;
-    color: #eeeeee;
-    background-color: #181818;
-    height: 40px;
+    &:hover {
+      background-color: #4d4d4d;
+    }
+    &:active {
+      background-color: #b3b3b3;
+      color: #020202;
+      box-shadow: inset 0 0 10px 5px rgba(0,0,0,0.2);
+    }
 `;
 
 const EditInputLabel = styled.label`
@@ -444,17 +452,25 @@ class ParamEditor extends React.Component<Props> {
   }
 
    public getModel(): Model {
+    
     return this.props.model;
+    
    }
 
-   public consoleLogModel(): void {
-     console.log(this.getModel());
+
+   public consoleLogMode = (e:React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      console.group('%c RESULT MODEL: ', 'background: #222; color: #5eff8e');
+      console.log(this.getModel());
+      console.groupEnd();
+      alert("Check your browser console")
    }
+
 
    render(): React.ReactNode {
       const inputs = this.props.model.paramValues.map(el=>{
           const relatedParam = this.props.params.find(el2=>el2.id==el.paramId)?.type;
-          return <Input removeParam={this.props.removeParam} relatedParam={relatedParam} params={this.props.params} el={el} />
+          return <Input key={el.paramId} removeParam={this.props.removeParam} relatedParam={relatedParam} params={this.props.params} el={el} />
       });
 
       return (
@@ -462,7 +478,7 @@ class ParamEditor extends React.Component<Props> {
             <form action="">
               <ProductInfo>Product info</ProductInfo>
                 {inputs}
-                <SubmitParam type="submit" value="submit">Отправить</SubmitParam>
+                <SubmitParam onClick={this.consoleLogMode} type="submit" value="submit">Отправить</SubmitParam>
             </form>
         </ParamEditorBlock>
       );
@@ -498,8 +514,7 @@ const Input:React.FC<Input> = ({removeParam, relatedParam, params, el}) => {
           break;
   }
 
-  if (type == 'text' || type == 'number'){
-            
+  if (type == 'text' || type == 'number'){ 
     const labelName = params.find((el2:any)=>el.paramId==el2.id)?.name;
     resultInput = (
       <ParamRow>
@@ -530,23 +545,15 @@ const Input:React.FC<Input> = ({removeParam, relatedParam, params, el}) => {
       </ParamRow>
     )
   }
-
   return <>{resultInput}</>
 }
-
 
 
 export const AddParam:React.FC<any> = ({addParam}) => {
 
   const [pressButton, setPressButton] = useState(false);
   const [currentSelect, setCurrentSelect] = useState(ParamTypes.null);
-
   const [inputText, setInputText] = useState('');
-
-  ///////////////////////////////////////////////////////////////////////////////////////
-  const inputChange = (value:string) => {
-    setInputText(value);
-  }
 
   const click = () => {
     setPressButton(!pressButton);
@@ -578,7 +585,6 @@ export const AddParam:React.FC<any> = ({addParam}) => {
 
 const SelectModelType:React.FC<SelectModelTypeProps> = ({setCurrentSelect}) => {
   const select = (val:ParamTypes) => setCurrentSelect(val);
-
   return (
     <>
       <SelectModelButton onClick={()=>select(ParamTypes.string)} position="1">"Ab"</SelectModelButton>
@@ -589,9 +595,7 @@ const SelectModelType:React.FC<SelectModelTypeProps> = ({setCurrentSelect}) => {
 }
 
 
-
 const AddParamInput:React.FC<any> = ({inputText, setInputText}) => {
-
   const inputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value);
   }
@@ -602,7 +606,6 @@ const AddParamInput:React.FC<any> = ({inputText, setInputText}) => {
     </>
   )
 }
-
 
 export const App: React.FC = () => {
     const [params, setParams] = useState([
@@ -619,7 +622,6 @@ export const App: React.FC = () => {
         { "paramId": 3, "value": "green"},
         { "paramId": 4, "value": "9999" }
       ]
-     //colors: Color[]; ;
     });
 
     const addParam = (paramName:string, paramType:ParamTypes) => {
@@ -632,6 +634,7 @@ export const App: React.FC = () => {
       setParams([...params.filter(el=>el.id!=paramID)]);
       setModel ( {...model, paramValues: [...model.paramValues.filter(el=>el.paramId!=paramID)]});
     }
+
   return (
     <AppWrapper>
       <Content>
