@@ -1,4 +1,4 @@
-### `See result -> https://sergeykiselev2001.github.io/selsup/`
+### See result -> https://sergeykiselev2001.github.io/selsup/
 
 # Getting Started with Create React App
 
